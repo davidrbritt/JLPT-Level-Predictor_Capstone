@@ -4,6 +4,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import joblib
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import FunctionTransformer
 #Parses Japanese text to create features
 #Trains Random Forest Classifier(Predictive Method)
 #Evaluates The accuracy of the model( Section D "Testing")
@@ -28,44 +33,88 @@ for col in ['Original', 'Furigana', 'JLPT Level']:
 
 print(f"Data Cleaning Complete: {len(df)} words remaining (Removed {initial_count - len(df)} rows.)")
 
-#FEATURE ENGINEERING
-def extract_features(row):
-    word = str(row['Original'])
-    reading = str(row['Furigana'])
-    kanji_count = sum(1 for char in word if '\u4e00' <= char <= '\u9faf')
-    hiragana_count = sum(1 for char in word if '\u3040' <= char <= '\u309f')
-    katakana_count = sum(1 for char in word if '\u30a0' <= char <= '\u30ff')
-    
-    return [
-        len(word),    #Written Length
-        len(reading), #Phonetic length
-        kanji_count,   #Visual complexity
-        hiragana_count,
-        katakana_count,
-        kanji_count / len(word) if len(word) > 0 else 0 #Complexity ratio
+#Split data for pipeline
+df_train, df_test = train_test_split(df, test_size=0.10, random_state=42)
+y_train = df_train['JLPT Level']
+y_test = df_test['JLPT Level']
+
+#Helper to get manual features
+def get_manual_features(df):
+    feats = []
+    for _, row in df.iterrows():
+        word = str(row['Original'])
+        reading = str(row['Furigana'])
+        kanji_count = sum(1 for char in word if '\u4e00' <= char <= '\u9faf')
+        feats.append([
+            len(word),
+            len(reading),
+            kanji_count, 
+            kanji_count/len(word) if len(word) > 0 else 0
+            ])
+    return np.array(feats)
+
+#Build Pipeline
+#Handles the character 'identity' (TF-IDF) and the structure (Manual)
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('word_tfidf', TfidfVectorizer(analyzer='char', ngram_range=(1, 3)), 'Original'),
+        ('reading_tfidf', TfidfVectorizer(analyzer='char', ngram_range=(1, 3)), 'Furigana'),
+        ('manual', FunctionTransformer(get_manual_features), ['Original', 'Furigana'])
     ]
+)
 
-X = np.array(df.apply(extract_features, axis=1).tolist())
-y = df['JLPT Level']
+clf = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('classifier', RandomForestClassifier(n_estimators=300, class_weight='balanced', random_state=42))
+])
 
-#Training and Testing Split (Reserve 10% for testing)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=42)
+#Train the pipeline
+print("Training the model (This may take a moment due to TF-IDF). . .")
+clf.fit(df_train, y_train)
 
-#Train model
-model = RandomForestClassifier(n_estimators=500, random_state=42, class_weight='balanced')
-model.fit(X_train, y_train)
-
-#Evaluate Results (SECTION D)
-y_pred = model.predict(X_test)
+#Evaluate results
+y_pred = clf.predict(df_test)
 accuracy = accuracy_score(y_test, y_pred)
 
+#FEATURE ENGINEERING
+#def extract_features(row):
+#    word = str(row['Original'])
+#    reading = str(row['Furigana'])
+#    kanji_count = sum(1 for char in word if '\u4e00' <= char <= '\u9faf')
+#    hiragana_count = sum(1 for char in word if '\u3040' <= char <= '\u309f')
+#    katakana_count = sum(1 for char in word if '\u30a0' <= char <= '\u30ff')
+#    
+#    return [
+#        len(word),    #Written Length
+#        len(reading), #Phonetic length
+#        kanji_count,   #Visual complexity
+#        hiragana_count,
+#        katakana_count,
+#        kanji_count / len(word) if len(word) > 0 else 0 #Complexity ratio
+#    ]
+#
+#X = np.array(df.apply(extract_features, axis=1).tolist())
+#y = df['JLPT Level']
+
+#Training and Testing Split (Reserve 10% for testing)
+#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=42)
+
+#Train model
+#model = RandomForestClassifier(n_estimators=500, random_state=42, class_weight='balanced')
+#model.fit(X_train, y_train)
+
+#Evaluate Results (SECTION D)
+#y_pred = model.predict(X_test)
+#accuracy = accuracy_score(y_test, y_pred)
+
 print(f"Total Samples: {len(df)}")
-print(f"Training Samples: {len(X_train)}")
-print(f"Testing Samples: {len(X_test)}")
+print(f"Training Samples: {len(df_train)}")
+print(f"Testing Samples: {len(df_test)}")
 print(f"\nModel Accuracy on 10% Hold-Out: {accuracy:.2%}")
 print("\nClassification Report (Section D):")
 print(classification_report(y_test, y_pred))
 
 #Save the model
-joblib.dump(model, 'src/jlpt_model.pkl')
+joblib.dump(clf, 'src/jlpt_model.pkl')
 df.to_csv('data/jlpt_vocab_cleaned.csv', index=False)
+print("\nSuccess: Pipeline saved to 'src/jlpt_model.pkl'")
