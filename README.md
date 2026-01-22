@@ -3,7 +3,7 @@
 This project is a machine learning powered Natural Language Processing (NLP) Dashboard meant to evaluate the difficulty level of Japanese text on the JLPT scale from N5 (Beginner) to N1 (Advanced). 
 
 ## Project Overview
-This project addresses the issue of determining reading difficulty for Japanese language learners and educators. Unlike traditional dictionary-based lookups, this application uses a **Random Forest Classifier** to predict the difficulty of unknwn words which helps analyze a paragraph's difficulty as a whole.
+This project addresses the issue of determining reading difficulty for Japanese language learners and educators. Unlike traditional dictionary-based lookups, this application uses a **Random Forest Classifier** to predict the difficulty of unknown words which helps analyze a paragraph's difficulty as a whole.
 
 ### Key Features:
 **Morphological Analysis:** Uses `Fugashi` (MeCab) to parse Japanese sentences into discrete parts of speech.
@@ -48,23 +48,23 @@ This project addresses the issue of determining reading difficulty for Japanese 
 ---
 ## Project Structure
 
-* app.py: The main streamlit dashboard application.
+* **app.py:** The main streamlit dashboard application.
 
-* requirements.txt: List of required Python libraries.
+* **requirements.txt:** List of required Python libraries.
 
-* src/: Contains the trained model jlpt_model.pkl (managed by Git LFS).
+* **src/:** Contains the trained model jlpt_model.pkl (managed by Git LFS).
 
-* data/: Contains the raw and cleaned JLPT vocabulary datasets.
+* **data/:** Contains the raw and cleaned JLPT vocabulary datasets.
 
-* notebooks/: Contains source code for data analysis and model training (train_model.py, descriptive_analysis.py).
+* **notebooks/:** Contains source code for data analysis and model training (train_model.py, descriptive_analysis.py).
 
-* docs/: Project documentation, including the Executive Summary and Transmittal Letter.
+* **docs/:** Project documentation, including the Executive Summary and Transmittal Letter.
 
-* screenshots/: Visual records of model iterations and the dashboard development.
+* **screenshots/:** Visual records of model iterations and the dashboard development.
 
-* assets/: Images used within the application interface.
+* **assets/:** Images used within the application interface.
 
-* .gitattributes: Configuration for Git LFS tracking.
+* **.gitattributes:** Configuration for Git LFS tracking.
 
 ## Development Progress
 
