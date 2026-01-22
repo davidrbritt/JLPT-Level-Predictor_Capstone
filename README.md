@@ -2,6 +2,10 @@
 
 This project is a machine learning powered Natural Language Processing (NLP) Dashboard meant to evaluate the difficulty level of Japanese text on the JLPT scale from N5 (Beginner) to N1 (Advanced). 
 
+## Japanese Basics
+
+The Japanese language is made up of three scripts. The first two are phonetic syllabaries called Hiragana and Katakana or collectively as Kana. The third script is known as Kanji, there are Thousands of Kanji and each one represents a word or idea. Kanji are characters borrowed from the Chinese language. Kanji are typically found in more difficult words where as words that are entirely Kana are typically a beginner difficulty level.
+
 ## Project Overview
 This project addresses the issue of determining reading difficulty for Japanese language learners and educators. Unlike traditional dictionary-based lookups, this application uses a **Random Forest Classifier** to predict the difficulty of unknown words which helps analyze a paragraph's difficulty as a whole.
 
