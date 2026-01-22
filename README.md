@@ -21,7 +21,7 @@ This project addresses the issue of determining reading difficulty for Japanese 
 ---
 
 ## Installation and Setup
-
+Note: If using an MSYS2/MinGW64 Python environment on Windows, some dependencies may fail to build due to missing backend compilers. It is recommended to use the official Python 3.11+ distribution from Python.org for the best installation experience.
 ### 1. Prerequisites
 * Python 3.9+
 * **Git LFS:** This project uses Git Large File Storage for the 224 MB model file. Ensure Git LFS is installed before cloning.
@@ -30,14 +30,31 @@ This project addresses the issue of determining reading difficulty for Japanese 
     ```
 ### 2. Clone the Repository
 
-    git clone [https://github.com/davidrbritt/JLPT-Level-Predictor_Capstone.git](https://github.com/davidrbritt/JLPT-Level-Predictor_Capstone.git)
+    git clone https://github.com/davidrbritt/JLPT-Level-Predictor_Capstone.git
+
     cd JLPT-Level-Predictor_Capstone
+
+### 3. Set Up Virtual Environment
+It is recommended to use a virtual envionment to avoid dependency conflicts.
+
+```bash
+# Create the environment
+python -m venv .venv
+
+# Activate it (Windows)
+.\.venv\Scripts\activate
+# OR if there is an error
+.\.venv\bin\Activate.ps1
+
+# Activate it (Mac/Linux)
+source .venv/bin/activate
+```
     
-### 3. Install Dependencies
+### 4. Install Dependencies
     
     pip install -r requirements.txt
     
-### 4. Run the Application
+### 5. Run the Application
     
     streamlit run app.py
 
